@@ -78,7 +78,7 @@ int validate_value( XMLRPC_VALUE xDesc, XMLRPC_VALUE xVal );
 /* iterates through a list of structs and finds the one with key "name" matching
  * needle.  slow, would benefit from a struct key hash.
  */
-inline XMLRPC_VALUE find_named_value(XMLRPC_VALUE list, const char* needle) {
+XMLRPC_VALUE find_named_value(XMLRPC_VALUE list, const char* needle) {
    XMLRPC_VALUE xIter = XMLRPC_VectorRewind(list);
    while(xIter) {
       const char* name = XMLRPC_VectorGetStringWithID(xIter, xi_token_name);
@@ -108,7 +108,7 @@ static void check_docs_loaded(XMLRPC_SERVER server, void* userData) {
 
 
 /* utility function for xi_system_describe_methods_cb */
-inline void describe_method(XMLRPC_SERVER server, XMLRPC_VALUE vector, const char* method) {
+void describe_method(XMLRPC_SERVER server, XMLRPC_VALUE vector, const char* method) {
    if(method) {
       server_method* sm = find_method(server, method);
       if(sm) {

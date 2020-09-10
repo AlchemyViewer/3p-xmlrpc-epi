@@ -165,7 +165,7 @@ void base64_decode(struct buffer_st *bfr, const char *source, int length)
         return;
         }
 
-        if (dtable[c] & 0x80) {
+        if (dtable[(unsigned char)c] & 0x80) {
           /*
           fprintf(stderr, "Offset %i length %i\n", offset, length);
           fprintf(stderr, "character '%c:%x:%c' in input file.\n", c, c, dtable[c]);

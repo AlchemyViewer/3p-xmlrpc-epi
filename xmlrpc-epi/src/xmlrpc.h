@@ -41,6 +41,16 @@
 extern "C" {
 #endif
 
+#if !defined(XMLRPCEPI_STATIC) && defined(_MSC_VER)
+#ifdef XMLRPCEPI_EXPORTS
+#define XMLRPCEPI_IMPEXP _declspec(dllexport)
+#else
+#define XMLRPCEPI_IMPEXP _declspec(dllimport)
+#endif
+#else
+#define XMLRPCEPI_IMPEXP
+#endif
+
 /* allow version to be specified via compile line define */
 #ifndef XMLRPC_LIB_VERSION
  #define XMLRPC_LIB_VERSION "0.54"
@@ -318,112 +328,112 @@ typedef XMLRPC_VALUE (*XMLRPC_Callback)(XMLRPC_SERVER server, XMLRPC_REQUEST inp
 /******/
 
 /* ID Case Defaults */
-XMLRPC_CASE XMLRPC_GetDefaultIdCase(void);
-XMLRPC_CASE XMLRPC_SetDefaultIdCase(XMLRPC_CASE id_case);
-XMLRPC_CASE_COMPARISON XMLRPC_GetDefaultIdCaseComparison(void);
-XMLRPC_CASE_COMPARISON XMLRPC_SetDefaultIdCaseComparison(XMLRPC_CASE_COMPARISON id_case);
+XMLRPCEPI_IMPEXP XMLRPC_CASE XMLRPC_GetDefaultIdCase(void);
+XMLRPCEPI_IMPEXP XMLRPC_CASE XMLRPC_SetDefaultIdCase(XMLRPC_CASE id_case);
+XMLRPCEPI_IMPEXP XMLRPC_CASE_COMPARISON XMLRPC_GetDefaultIdCaseComparison(void);
+XMLRPCEPI_IMPEXP XMLRPC_CASE_COMPARISON XMLRPC_SetDefaultIdCaseComparison(XMLRPC_CASE_COMPARISON id_case);
 
 /* Vector manipulation */
-int XMLRPC_VectorSize(XMLRPC_VALUE value);
-XMLRPC_VALUE XMLRPC_VectorRewind(XMLRPC_VALUE value);
-XMLRPC_VALUE XMLRPC_VectorNext(XMLRPC_VALUE value);
-int XMLRPC_SetIsVector(XMLRPC_VALUE value, XMLRPC_VECTOR_TYPE type);
-int XMLRPC_AddValueToVector(XMLRPC_VALUE target, XMLRPC_VALUE source);
-int XMLRPC_AddValuesToVector(XMLRPC_VALUE target, ...);
-int XMLRPC_VectorRemoveValue(XMLRPC_VALUE vector, XMLRPC_VALUE value);
-XMLRPC_VALUE XMLRPC_VectorGetValueWithID_Case(XMLRPC_VALUE vector, const char* id, XMLRPC_CASE_COMPARISON id_case);
+XMLRPCEPI_IMPEXP int XMLRPC_VectorSize(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_VectorRewind(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_VectorNext(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_SetIsVector(XMLRPC_VALUE value, XMLRPC_VECTOR_TYPE type);
+XMLRPCEPI_IMPEXP int XMLRPC_AddValueToVector(XMLRPC_VALUE target, XMLRPC_VALUE source);
+XMLRPCEPI_IMPEXP int XMLRPC_AddValuesToVector(XMLRPC_VALUE target, ...);
+XMLRPCEPI_IMPEXP int XMLRPC_VectorRemoveValue(XMLRPC_VALUE vector, XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_VectorGetValueWithID_Case(XMLRPC_VALUE vector, const char* id, XMLRPC_CASE_COMPARISON id_case);
 
 
 /* Create values */
-XMLRPC_VALUE XMLRPC_CreateValueBoolean(const char* id, int truth);
-XMLRPC_VALUE XMLRPC_CreateValueBase64(const char* id, const char* s, int len);
-XMLRPC_VALUE XMLRPC_CreateValueDateTime(const char* id, time_t time);
-XMLRPC_VALUE XMLRPC_CreateValueDateTime_ISO8601(const char* id, const char *s);
-XMLRPC_VALUE XMLRPC_CreateValueDouble(const char* id, double f);
-XMLRPC_VALUE XMLRPC_CreateValueInt(const char* id, int i);
-XMLRPC_VALUE XMLRPC_CreateValueString(const char* id, const char* s, int len);
-XMLRPC_VALUE XMLRPC_CreateValueEmpty(void);
-XMLRPC_VALUE XMLRPC_CreateVector(const char* id, XMLRPC_VECTOR_TYPE type);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueBoolean(const char* id, int truth);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueBase64(const char* id, const char* s, int len);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueDateTime(const char* id, time_t time);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueDateTime_ISO8601(const char* id, const char *s);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueDouble(const char* id, double f);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueInt(const char* id, int i);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueString(const char* id, const char* s, int len);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateValueEmpty(void);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CreateVector(const char* id, XMLRPC_VECTOR_TYPE type);
 
 /* Cleanup values */
-void XMLRPC_CleanupValue(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP void XMLRPC_CleanupValue(XMLRPC_VALUE value);
 
 /* Request error */
-XMLRPC_VALUE XMLRPC_RequestSetError (XMLRPC_REQUEST request, XMLRPC_VALUE error);
-XMLRPC_VALUE XMLRPC_RequestGetError (XMLRPC_REQUEST request);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_RequestSetError (XMLRPC_REQUEST request, XMLRPC_VALUE error);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_RequestGetError (XMLRPC_REQUEST request);
 
 /* Copy values */
-XMLRPC_VALUE XMLRPC_CopyValue(XMLRPC_VALUE value);
-XMLRPC_VALUE XMLRPC_DupValueNew(XMLRPC_VALUE xSource);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_CopyValue(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_DupValueNew(XMLRPC_VALUE xSource);
 
 /* Set Values */
-void XMLRPC_SetValueDateTime(XMLRPC_VALUE value, time_t time);
-void XMLRPC_SetValueDateTime_ISO8601(XMLRPC_VALUE value, const char* s);
-void XMLRPC_SetValueDouble(XMLRPC_VALUE value, double val);
-void XMLRPC_SetValueInt(XMLRPC_VALUE value, int val);
-void XMLRPC_SetValueBoolean(XMLRPC_VALUE value, int val);
-const char *XMLRPC_SetValueString(XMLRPC_VALUE value, const char* s, int len);
-void XMLRPC_SetValueBase64(XMLRPC_VALUE value, const char* s, int len);
-const char *XMLRPC_SetValueID_Case(XMLRPC_VALUE value, const char* id, int len, XMLRPC_CASE id_case);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueDateTime(XMLRPC_VALUE value, time_t time);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueDateTime_ISO8601(XMLRPC_VALUE value, const char* s);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueDouble(XMLRPC_VALUE value, double val);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueInt(XMLRPC_VALUE value, int val);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueBoolean(XMLRPC_VALUE value, int val);
+XMLRPCEPI_IMPEXP const char *XMLRPC_SetValueString(XMLRPC_VALUE value, const char* s, int len);
+XMLRPCEPI_IMPEXP void XMLRPC_SetValueBase64(XMLRPC_VALUE value, const char* s, int len);
+XMLRPCEPI_IMPEXP const char *XMLRPC_SetValueID_Case(XMLRPC_VALUE value, const char* id, int len, XMLRPC_CASE id_case);
 #define XMLRPC_SetValueID(value, id, len) XMLRPC_SetValueID_Case(value, id, len, XMLRPC_DEFAULT_ID_CASE)
 
 /* Get Values */
-const char* XMLRPC_GetValueString(XMLRPC_VALUE value);
-int XMLRPC_GetValueStringLen(XMLRPC_VALUE value);
-int XMLRPC_GetValueInt(XMLRPC_VALUE value);
-int XMLRPC_GetValueBoolean(XMLRPC_VALUE value);
-double XMLRPC_GetValueDouble(XMLRPC_VALUE value);
-const char* XMLRPC_GetValueBase64(XMLRPC_VALUE value);
-time_t XMLRPC_GetValueDateTime(XMLRPC_VALUE value);
-const char* XMLRPC_GetValueDateTime_ISO8601(XMLRPC_VALUE value);
-const char* XMLRPC_GetValueID(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetValueString(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_GetValueStringLen(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_GetValueInt(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_GetValueBoolean(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP double XMLRPC_GetValueDouble(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetValueBase64(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP time_t XMLRPC_GetValueDateTime(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetValueDateTime_ISO8601(XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetValueID(XMLRPC_VALUE value);
 
 /* Type introspection */
-XMLRPC_VALUE_TYPE XMLRPC_GetValueType(XMLRPC_VALUE v);
-XMLRPC_VALUE_TYPE_EASY XMLRPC_GetValueTypeEasy(XMLRPC_VALUE v);
-XMLRPC_VECTOR_TYPE XMLRPC_GetVectorType(XMLRPC_VALUE v);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE_TYPE XMLRPC_GetValueType(XMLRPC_VALUE v);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE_TYPE_EASY XMLRPC_GetValueTypeEasy(XMLRPC_VALUE v);
+XMLRPCEPI_IMPEXP XMLRPC_VECTOR_TYPE XMLRPC_GetVectorType(XMLRPC_VALUE v);
 
 /* Parsing and Creating XML */
-XMLRPC_REQUEST XMLRPC_REQUEST_FromXML(const char* in_buf, int len, XMLRPC_REQUEST_INPUT_OPTIONS in_options);
-XMLRPC_VALUE XMLRPC_VALUE_FromXML(const char* in_buf, int len, XMLRPC_REQUEST_INPUT_OPTIONS in_options);
-char* XMLRPC_REQUEST_ToXML(XMLRPC_REQUEST request, int *buf_len);
-char* XMLRPC_VALUE_ToXML(XMLRPC_VALUE val, int* buf_len);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST XMLRPC_REQUEST_FromXML(const char* in_buf, int len, XMLRPC_REQUEST_INPUT_OPTIONS in_options);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_VALUE_FromXML(const char* in_buf, int len, XMLRPC_REQUEST_INPUT_OPTIONS in_options);
+XMLRPCEPI_IMPEXP char* XMLRPC_REQUEST_ToXML(XMLRPC_REQUEST request, int *buf_len);
+XMLRPCEPI_IMPEXP char* XMLRPC_VALUE_ToXML(XMLRPC_VALUE val, int* buf_len);
 
 /* Request manipulation funcs */
-const char* XMLRPC_RequestSetMethodName(XMLRPC_REQUEST request, const char* methodName);
-const char* XMLRPC_RequestGetMethodName(XMLRPC_REQUEST request);
-XMLRPC_REQUEST XMLRPC_RequestNew(void);
-void XMLRPC_RequestFree(XMLRPC_REQUEST request, int bFreeIO);
-XMLRPC_REQUEST_OUTPUT_OPTIONS XMLRPC_RequestSetOutputOptions(XMLRPC_REQUEST request, XMLRPC_REQUEST_OUTPUT_OPTIONS output);
-XMLRPC_REQUEST_OUTPUT_OPTIONS XMLRPC_RequestGetOutputOptions(XMLRPC_REQUEST request);
-XMLRPC_VALUE XMLRPC_RequestSetData(XMLRPC_REQUEST request, XMLRPC_VALUE data);
-XMLRPC_VALUE XMLRPC_RequestGetData(XMLRPC_REQUEST request);
-XMLRPC_REQUEST_TYPE XMLRPC_RequestSetRequestType(XMLRPC_REQUEST request, XMLRPC_REQUEST_TYPE type);
-XMLRPC_REQUEST_TYPE XMLRPC_RequestGetRequestType(XMLRPC_REQUEST request);
+XMLRPCEPI_IMPEXP const char* XMLRPC_RequestSetMethodName(XMLRPC_REQUEST request, const char* methodName);
+XMLRPCEPI_IMPEXP const char* XMLRPC_RequestGetMethodName(XMLRPC_REQUEST request);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST XMLRPC_RequestNew(void);
+XMLRPCEPI_IMPEXP void XMLRPC_RequestFree(XMLRPC_REQUEST request, int bFreeIO);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST_OUTPUT_OPTIONS XMLRPC_RequestSetOutputOptions(XMLRPC_REQUEST request, XMLRPC_REQUEST_OUTPUT_OPTIONS output);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST_OUTPUT_OPTIONS XMLRPC_RequestGetOutputOptions(XMLRPC_REQUEST request);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_RequestSetData(XMLRPC_REQUEST request, XMLRPC_VALUE data);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_RequestGetData(XMLRPC_REQUEST request);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST_TYPE XMLRPC_RequestSetRequestType(XMLRPC_REQUEST request, XMLRPC_REQUEST_TYPE type);
+XMLRPCEPI_IMPEXP XMLRPC_REQUEST_TYPE XMLRPC_RequestGetRequestType(XMLRPC_REQUEST request);
 
 /* Server Creation/Destruction; Method Registration and Invocation */
-XMLRPC_SERVER XMLRPC_ServerCreate(void);
-XMLRPC_SERVER XMLRPC_GetGlobalServer(void);   /* better to use XMLRPC_ServerCreate if you can */
-void XMLRPC_ServerDestroy(XMLRPC_SERVER server);
-int XMLRPC_ServerRegisterMethod(XMLRPC_SERVER server, const char *name, XMLRPC_Callback cb);
-XMLRPC_Callback XMLRPC_ServerFindMethod(XMLRPC_SERVER server, const char* callName);
-XMLRPC_VALUE XMLRPC_ServerCallMethod(XMLRPC_SERVER server, XMLRPC_REQUEST request, void* userData);
+XMLRPCEPI_IMPEXP XMLRPC_SERVER XMLRPC_ServerCreate(void);
+XMLRPCEPI_IMPEXP XMLRPC_SERVER XMLRPC_GetGlobalServer(void);   /* better to use XMLRPC_ServerCreate if you can */
+XMLRPCEPI_IMPEXP void XMLRPC_ServerDestroy(XMLRPC_SERVER server);
+XMLRPCEPI_IMPEXP int XMLRPC_ServerRegisterMethod(XMLRPC_SERVER server, const char *name, XMLRPC_Callback cb);
+XMLRPCEPI_IMPEXP XMLRPC_Callback XMLRPC_ServerFindMethod(XMLRPC_SERVER server, const char* callName);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_ServerCallMethod(XMLRPC_SERVER server, XMLRPC_REQUEST request, void* userData);
 
 #include "xmlrpc_introspection.h"
 
 /* Fault interrogation funcs */
-int XMLRPC_ValueIsFault (XMLRPC_VALUE value);
-int XMLRPC_ResponseIsFault(XMLRPC_REQUEST response);
-int XMLRPC_GetValueFaultCode (XMLRPC_VALUE value);
-int XMLRPC_GetResponseFaultCode(XMLRPC_REQUEST response);
-const char* XMLRPC_GetValueFaultString (XMLRPC_VALUE value);
-const char* XMLRPC_GetResponseFaultString (XMLRPC_REQUEST response);
+XMLRPCEPI_IMPEXP int XMLRPC_ValueIsFault (XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_ResponseIsFault(XMLRPC_REQUEST response);
+XMLRPCEPI_IMPEXP int XMLRPC_GetValueFaultCode (XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP int XMLRPC_GetResponseFaultCode(XMLRPC_REQUEST response);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetValueFaultString (XMLRPC_VALUE value);
+XMLRPCEPI_IMPEXP const char* XMLRPC_GetResponseFaultString (XMLRPC_REQUEST response);
 
 
 /* Public Utility funcs */
-XMLRPC_VALUE XMLRPC_UtilityCreateFault(int fault_code, const char* fault_string);
-void XMLRPC_Free(void* mem);
-const char*  XMLRPC_GetVersionString(void);
+XMLRPCEPI_IMPEXP XMLRPC_VALUE XMLRPC_UtilityCreateFault(int fault_code, const char* fault_string);
+XMLRPCEPI_IMPEXP void XMLRPC_Free(void* mem);
+XMLRPCEPI_IMPEXP const char*  XMLRPC_GetVersionString(void);
 
 /****d* VALUE/XMLRPC_MACROS
  * NAME

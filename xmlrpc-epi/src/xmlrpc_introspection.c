@@ -627,7 +627,7 @@ int validate_scalar(XMLRPC_VALUE xDesc, XMLRPC_VALUE xVal, XMLRPC_VALUE_TYPE_EAS
       }
    }
    else if(etype == xmlrpc_double) {
-      int dVal = XMLRPC_GetValueDouble(xVal);
+       double dVal = XMLRPC_GetValueDouble(xVal);
       if( pmin ) {
          double min = atof(pmin);
          if( dVal < min ) {

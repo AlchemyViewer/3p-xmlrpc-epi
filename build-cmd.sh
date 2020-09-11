@@ -56,11 +56,11 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
             then 
-                cp Debug/xmlrpcepi.{lib,dll,exp,pdb} "$stage/lib/debug/"
-                cp Release/xmlrpcepi.{lib,dll,exp,pdb} "$stage/lib/release/"
+                cp Debug/xmlrpc-epid.{lib,dll,exp,pdb} "$stage/lib/debug/"
+                cp Release/xmlrpc-epi.{lib,dll,exp,pdb} "$stage/lib/release/"
             else 
-                cp x64/Debug/xmlrpcepi.{lib,dll,exp,pdb} "$stage/lib/debug/"
-                cp x64/Release/xmlrpcepi.{lib,dll,exp,pdb} "$stage/lib/release/"
+                cp x64/Debug/xmlrpc-epid.{lib,dll,exp,pdb} "$stage/lib/debug/"
+                cp x64/Release/xmlrpc-epi.{lib,dll,exp,pdb} "$stage/lib/release/"
             fi
 
             

@@ -62,44 +62,135 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 cp x64/Debug/xmlrpc-epid.{lib,dll,exp,pdb} "$stage/lib/debug/"
                 cp x64/Release/xmlrpc-epi.{lib,dll,exp,pdb} "$stage/lib/release/"
             fi
-
-            
+     
             mkdir -p "$stage/include/xmlrpc-epi"
             copy_headers "$stage/include/xmlrpc-epi"
         ;;
         darwin*)
-            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD_RELEASE"
-            CFLAGS="$opts" CXXFLAGS="$opts" LDFLAGS="$opts" ./configure --prefix="$stage" \
-                --with-expat=no \
-                --with-expat-lib="$stage/packages/lib/release/libexpat.dylib" \
-                --with-expat-inc="$stage/packages/include/expat"
-            make
-            make install
+            # Setup osx sdk platform
+            SDKNAME="macosx10.15"
+            export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
+            export MACOSX_DEPLOYMENT_TARGET=10.13
+
+            # Setup build flags
+            ARCH_FLAGS="-arch x86_64"
+            SDK_FLAGS="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET} -isysroot ${SDKROOT}"
+            DEBUG_COMMON_FLAGS="$ARCH_FLAGS $SDK_FLAGS -Og -g -msse4.2 -fPIC -DPIC"
+            RELEASE_COMMON_FLAGS="$ARCH_FLAGS $SDK_FLAGS -Ofast -ffast-math -g -msse4.2 -fPIC -DPIC -fstack-protector-strong"
+            DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
+            RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
+            DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
+            RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
+            DEBUG_CPPFLAGS="-DPIC"
+            RELEASE_CPPFLAGS="-DPIC"
+            DEBUG_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names -Wl,-macos_version_min,$MACOSX_DEPLOYMENT_TARGET"
+            RELEASE_LDFLAGS="$ARCH_FLAGS $SDK_FLAGS -Wl,-headerpad_max_install_names -Wl,-macos_version_min,$MACOSX_DEPLOYMENT_TARGET"
+
+            JOBS=`sysctl -n hw.ncpu`
+
+            PREFIX_DEBUG="$stage/temp_debug"
+            PREFIX_RELEASE="$stage/temp_release"
+
+            mkdir -p $PREFIX_DEBUG
+            mkdir -p $PREFIX_RELEASE
+
+            autoreconf -fvi
+
+            mkdir -p "build_debug"
+            pushd "build_debug"
+                CFLAGS="$DEBUG_CFLAGS" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="$DEBUG_LDFLAGS" \
+                    ../configure --enable-debug --prefix="$PREFIX_DEBUG" \
+                        --with-expat=yes \
+                        --with-expat-lib="-L$stage/packages/lib/debug/ -lexpat" \
+                        --with-expat-inc="$stage/packages/include/expat"
+                make -j$JOBS
+                make install
+            popd
+
+            mkdir -p "build_release"
+            pushd "build_release"
+                CFLAGS="$RELEASE_CFLAGS" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="$RELEASE_LDFLAGS" \
+                    ../configure --prefix="$PREFIX_RELEASE" \
+                        --with-expat=yes \
+                        --with-expat-lib="-L$stage/packages/lib/release/ -lexpat" \
+                        --with-expat-inc="$stage/packages/include/expat"
+                make -j$JOBS
+                make install
+            popd
+
+            pushd "$PREFIX_DEBUG/lib"
+                fix_dylib_id "libxmlrpc-epi.dylib"
+                dsymutil libxmlrpc-epi.*.dylib
+                strip -x -S libxmlrpc-epi.*.dylib
+            popd
+
+            pushd "$PREFIX_RELEASE/lib"
+                fix_dylib_id "libxmlrpc-epi.dylib"
+                dsymutil libxmlrpc-epi.*.dylib
+                strip -x -S libxmlrpc-epi.*.dylib
+            popd
+
             mkdir -p "$stage/include/xmlrpc-epi"
-            mv "$stage/include/"*.h "$stage/include/xmlrpc-epi/"
+            mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-            mv "$stage/lib/"*.a "$stage/lib/release"
-            mv "$stage/lib/"*.dylib "$stage/lib/release"
-            rm "$stage/lib/"*.la
-            # The expat build manages to get these paths right automatically,
-            # but this one doesn't; whatever, just update the paths here:
-            install_name_tool -id "@executable_path/../Resources/libxmlrpc-epi.0.dylib" "$stage/lib/release/libxmlrpc-epi.0.dylib"
-            install_name_tool -change "/usr/lib/libexpat.1.dylib" "@executable_path/../Resources/libexpat.1.dylib" "$stage/lib/release/libxmlrpc-epi.0.dylib"
+
+            cp -a $PREFIX_DEBUG/lib/*.dylib* $stage/lib/debug
+            cp -a $PREFIX_RELEASE/lib/*.dylib* $stage/lib/release
+
+            cp -a $PREFIX_RELEASE/include/* $stage/include/xmlrpc-epi/
         ;;
         linux*)
-            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
-            CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage" \
-                --with-expat=no \
-                --with-expat-lib="$stage/packages/lib/release/libexpat.so" \
-                --with-expat-inc="$stage/packages/include/expat"
-            make
-            make install
-            mkdir -p "$stage/include/xmlrpc-epi"
-            mv "$stage/include/"*.h "$stage/include/xmlrpc-epi/"
+            # Default target per --address-size
+            opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
+            DEBUG_COMMON_FLAGS="$opts -Og -g -fPIC"
+            RELEASE_COMMON_FLAGS="$opts -O3 -g -fPIC -fstack-protector-strong -DPIC -D_FORTIFY_SOURCE=2"
+            DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
+            RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
+            DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
+            RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
+            DEBUG_CPPFLAGS="-DPIC"
+            RELEASE_CPPFLAGS="-DPIC -D_FORTIFY_SOURCE=2"
 
-            mv "$stage/lib" "$stage/release"
-            mkdir -p "$stage/lib"
-            mv "$stage/release" "$stage/lib"
+            JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
+
+            PREFIX_DEBUG="$stage/temp_debug"
+            PREFIX_RELEASE="$stage/temp_release"
+
+            mkdir -p $PREFIX_DEBUG
+            mkdir -p $PREFIX_RELEASE
+
+            autoreconf -fvi
+
+            mkdir -p "build_debug"
+            pushd "build_debug"
+                CFLAGS="$DEBUG_CFLAGS" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="$DEBUG_LDFLAGS" \
+                    ../configure --enable-debug --prefix="$PREFIX_DEBUG" \
+                        --with-expat=yes \
+                        --with-expat-lib="-L$stage/packages/lib/debug/ -lexpat" \
+                        --with-expat-inc="$stage/packages/include/expat"
+                make -j$JOBS
+                make install
+            popd
+
+            mkdir -p "build_release"
+            pushd "build_release"
+                CFLAGS="$RELEASE_CFLAGS" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="$RELEASE_LDFLAGS" \
+                    ../configure --prefix="$PREFIX_RELEASE" \
+                        --with-expat=yes \
+                        --with-expat-lib="-L$stage/packages/lib/release/ -lexpat" \
+                        --with-expat-inc="$stage/packages/include/expat"
+                make -j$JOBS
+                make install
+            popd
+
+            mkdir -p "$stage/include/xmlrpc-epi"
+            mkdir -p "$stage/lib/debug"
+            mkdir -p "$stage/lib/release"
+
+            cp -a $PREFIX_DEBUG/lib/*.a $stage/lib/debug
+            cp -a $PREFIX_RELEASE/lib/*.a $stage/lib/release
+
+            cp -a $PREFIX_RELEASE/include/* $stage/include/xmlrpc-epi/
         ;;
     esac
     mkdir -p "$stage/LICENSES"

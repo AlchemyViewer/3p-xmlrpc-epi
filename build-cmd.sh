@@ -41,8 +41,7 @@ copy_headers ()
     cp src/xml_to_xmlrpc.h $1
 }
 
-build=${AUTOBUILD_BUILD_ID:=0}
-echo "${XMLRPCEPI_VERSION}.${build}" > "${stage}/VERSION.txt"
+echo "${XMLRPCEPI_VERSION}" > "${stage}/VERSION.txt"
 
 pushd "$XMLRPCEPI_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in

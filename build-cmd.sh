@@ -150,6 +150,8 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
             DEBUG_CPPFLAGS="-DPIC"
             RELEASE_CPPFLAGS="-DPIC -D_FORTIFY_SOURCE=2"
+            DEBUG_LDFLAGS="$opts"
+            RELEASE_LDFLAGS="$opts"
 
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
 

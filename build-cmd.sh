@@ -99,9 +99,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             pushd "build_debug"
                 CFLAGS="$DEBUG_CFLAGS" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="$DEBUG_LDFLAGS" \
                     ../configure --enable-debug --prefix="$PREFIX_DEBUG" \
-                        --with-expat=yes \
-                        --with-expat-lib="-L$stage/packages/lib/debug/ -lexpat" \
-                        --with-expat-inc="$stage/packages/include/expat"
+                        --with-expat="$SDKROOT/usr"
                 make -j$JOBS
                 make install
             popd
@@ -110,9 +108,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             pushd "build_release"
                 CFLAGS="$RELEASE_CFLAGS" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="$RELEASE_LDFLAGS" \
                     ../configure --prefix="$PREFIX_RELEASE" \
-                        --with-expat=yes \
-                        --with-expat-lib="-L$stage/packages/lib/release/ -lexpat" \
-                        --with-expat-inc="$stage/packages/include/expat"
+                        --with-expat="$SDKROOT/usr"
                 make -j$JOBS
                 make install
             popd

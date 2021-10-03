@@ -160,10 +160,10 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_debug"
             pushd "build_debug"
-                CFLAGS="$DEBUG_CFLAGS" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="$DEBUG_LDFLAGS" \
+                CFLAGS="$DEBUG_CFLAGS -I$stage/packages/include/expat" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="-L$stage/packages/lib/debug $DEBUG_LDFLAGS" LIBS="-lexpat" \
                     ../configure --prefix="$PREFIX_DEBUG" \
                         --with-expat=package \
-                        --with-expat-lib="-L$stage/packages/lib/debug/ -lexpat" \
+                        --with-expat-lib="-L$stage/packages/lib/debug -lexpat" \
                         --with-expat-inc="$stage/packages/include/expat"
                 make -j$JOBS
                 make install
@@ -171,10 +171,10 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_release"
             pushd "build_release"
-                CFLAGS="$RELEASE_CFLAGS" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="$RELEASE_LDFLAGS" \
+                CFLAGS="$RELEASE_CFLAGS -I$stage/packages/include/expat" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="-L$stage/packages/lib/release $RELEASE_LDFLAGS" LIBS="-lexpat" \
                     ../configure --prefix="$PREFIX_RELEASE" \
                         --with-expat=package \
-                        --with-expat-lib="-L$stage/packages/lib/release/ -lexpat" \
+                        --with-expat-lib="-L$stage/packages/lib/release -lexpat" \
                         --with-expat-inc="$stage/packages/include/expat"
                 make -j$JOBS
                 make install

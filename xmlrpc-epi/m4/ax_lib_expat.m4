@@ -62,6 +62,9 @@ AC_DEFUN([AX_LIB_EXPAT],
                 expat_prefix=""
             fi
             expat_requested="yes"
+        elif test "$withval" = "package"; then
+            expat_prefix=""
+            expat_requested="yes"
         elif test -d "$withval"; then
             expat_prefix="$withval"
             expat_requested="yes"

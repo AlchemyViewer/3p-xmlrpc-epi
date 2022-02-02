@@ -164,7 +164,11 @@ static const char rcsid[] =
 #include "queue.h"
 #include "xmlrpc.h"
 
+#ifdef AL_BUILD
+#include <expat/expat.h>
+#else
 #include <expat.h>
+#endif
 
 #include "base64.h"
 

@@ -131,7 +131,11 @@ static const char rcsid[] = "#(@) $Id: xml_element.c,v 1.22 2008/04/16 13:03:15 
 #include <string.h>
 #include <ctype.h>
 
+#ifdef AL_BUILD
+#include <expat/expat.h>
+#else
 #include <expat.h>
+#endif
 
 #include "xml_element.h"
 #include "queue.h"

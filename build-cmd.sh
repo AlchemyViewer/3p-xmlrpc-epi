@@ -48,18 +48,18 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
         windows*)
             load_vsvars
 
-            build_sln "xmlrpcepi.sln" "Debug" "$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
-            build_sln "xmlrpcepi.sln" "Release" "$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
+            build_sln "xmlrpcepi.sln" "Debug|$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
+            build_sln "xmlrpcepi.sln" "Release|$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
 
             if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
             then 
-                cp Debug/xmlrpc-epid.{lib,dll,exp,pdb} "$stage/lib/debug/"
-                cp Release/xmlrpc-epi.{lib,dll,exp,pdb} "$stage/lib/release/"
+                cp Debug/xmlrpc-epid.lib "$stage/lib/debug/"
+                cp Release/xmlrpc-epi.lib "$stage/lib/release/"
             else 
-                cp x64/Debug/xmlrpc-epid.{lib,dll,exp,pdb} "$stage/lib/debug/"
-                cp x64/Release/xmlrpc-epi.{lib,dll,exp,pdb} "$stage/lib/release/"
+                cp x64/Debug/xmlrpc-epid.lib "$stage/lib/debug/"
+                cp x64/Release/xmlrpc-epi.lib "$stage/lib/release/"
             fi
      
             mkdir -p "$stage/include/xmlrpc-epi"

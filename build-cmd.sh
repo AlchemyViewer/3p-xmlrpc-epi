@@ -71,7 +71,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
 
             # Deploy Targets
-            X86_DEPLOY=10.15
+            X86_DEPLOY=10.13
             ARM64_DEPLOY=11.0
 
             # Setup build flags
@@ -106,26 +106,34 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_debug_x86"
             pushd "build_debug_x86"
+                cp -a $STAGING_DIR/packages/lib/debug/*.a $STAGING_DIR/packages/lib
+
                 CFLAGS="$ARCH_FLAGS_X86 $DEBUG_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_X86 $DEBUG_CXXFLAGS" \
                 LDFLAGS="$ARCH_FLAGS_X86 $DEBUG_LDFLAGS" \
                     ../configure --enable-debug --prefix="$X86_PREFIX_DEBUG" \
                         --host x86_64-apple-darwin \
-                        --with-expat="$SDKROOT/usr"
+                        --with-expat="$stage/packages"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
+
+                rm $STAGING_DIR/packages/lib/*.a
             popd
 
             mkdir -p "build_release_x86"
             pushd "build_release_x86"
+                cp -a $STAGING_DIR/packages/lib/release/*.a $STAGING_DIR/packages/lib
+
                 CFLAGS="$ARCH_FLAGS_X86 $RELEASE_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_X86 $RELEASE_CXXFLAGS" \
                 LDFLAGS="$ARCH_FLAGS_X86 $RELEASE_LDFLAGS" \
                     ../configure --prefix="$X86_PREFIX_RELEASE" \
                         --host x86_64-apple-darwin \
-                        --with-expat="$SDKROOT/usr"
+                        --with-expat="$stage/packages"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
+
+                rm $STAGING_DIR/packages/lib/*.a
             popd
 
             # ARM64 Deploy Target
@@ -133,26 +141,34 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_debug_arm64"
             pushd "build_debug_arm64"
+                cp -a $STAGING_DIR/packages/lib/debug/*.a $STAGING_DIR/packages/lib
+
                 CFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CXXFLAGS" \
                 LDFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_LDFLAGS" \
                     ../configure --enable-debug --prefix="$ARM_PREFIX_DEBUG" \
                         --host arm64-apple-darwin \
-                        --with-expat="$SDKROOT/usr"
+                        --with-expat="$stage/packages"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
+
+                rm $STAGING_DIR/packages/lib/*.a
             popd
 
             mkdir -p "build_release_arm64"
             pushd "build_release_arm64"
+                cp -a $STAGING_DIR/packages/lib/release/*.a $STAGING_DIR/packages/lib
+
                 CFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CXXFLAGS" \
                 LDFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_LDFLAGS" \
                     ../configure --prefix="$ARM_PREFIX_RELEASE" \
                         --host arm64-apple-darwin \
-                        --with-expat="$SDKROOT/usr"
+                        --with-expat="$stage/packages"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
+
+                rm $STAGING_DIR/packages/lib/*.a
             popd
 
             mkdir -p "$stage/include/xmlrpc-epi"

@@ -106,7 +106,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_debug_x86"
             pushd "build_debug_x86"
-                cp -a $STAGING_DIR/packages/lib/debug/*.a $STAGING_DIR/packages/lib
+                cp -a $stage/packages/lib/debug/*.a $stage/packages/lib
 
                 CFLAGS="$ARCH_FLAGS_X86 $DEBUG_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_X86 $DEBUG_CXXFLAGS" \
@@ -117,12 +117,12 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
 
-                rm $STAGING_DIR/packages/lib/*.a
+                rm $stage/packages/lib/*.a
             popd
 
             mkdir -p "build_release_x86"
             pushd "build_release_x86"
-                cp -a $STAGING_DIR/packages/lib/release/*.a $STAGING_DIR/packages/lib
+                cp -a $stage/packages/lib/release/*.a $stage/packages/lib
 
                 CFLAGS="$ARCH_FLAGS_X86 $RELEASE_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_X86 $RELEASE_CXXFLAGS" \
@@ -133,7 +133,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
 
-                rm $STAGING_DIR/packages/lib/*.a
+                rm $stage/packages/lib/*.a
             popd
 
             # ARM64 Deploy Target
@@ -141,7 +141,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_debug_arm64"
             pushd "build_debug_arm64"
-                cp -a $STAGING_DIR/packages/lib/debug/*.a $STAGING_DIR/packages/lib
+                cp -a $stage/packages/lib/debug/*.a $stage/packages/lib
 
                 CFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CXXFLAGS" \
@@ -152,12 +152,12 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
 
-                rm $STAGING_DIR/packages/lib/*.a
+                rm $stage/packages/lib/*.a
             popd
 
             mkdir -p "build_release_arm64"
             pushd "build_release_arm64"
-                cp -a $STAGING_DIR/packages/lib/release/*.a $STAGING_DIR/packages/lib
+                cp -a $stage/packages/lib/release/*.a $stage/packages/lib
 
                 CFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CFLAGS" \
                 CXXFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CXXFLAGS" \
@@ -168,7 +168,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
 
-                rm $STAGING_DIR/packages/lib/*.a
+                rm $stage/packages/lib/*.a
             popd
 
             mkdir -p "$stage/include/xmlrpc-epi"

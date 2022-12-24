@@ -71,7 +71,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
 
             # Deploy Targets
-            X86_DEPLOY=10.13
+            X86_DEPLOY=10.15
             ARM64_DEPLOY=11.0
 
             # Setup build flags

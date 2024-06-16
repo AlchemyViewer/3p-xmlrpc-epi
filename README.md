@@ -1,6 +1,6 @@
-# 3p-zlib-ng
+# 3p-xmlrpc-epi
 
-[Autobuild][] packaged [zlib-ng][].
+[Autobuild][] packaged [xmlrpc-epi][].
 
 [Autobuild]: https://github.com/secondlife/autobuild
-[zlib-ng]: https://github.com/zlib-ng/zlib-ng
+[xmlrpc-epi]: https://sourceforge.net/projects/xmlrpc-epi/

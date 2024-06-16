@@ -66,29 +66,19 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             copy_headers "$stage/include/xmlrpc-epi"
         ;;
         darwin*)
-            # Deploy Targets
-            X86_DEPLOY=11.0
-            ARM64_DEPLOY=11.0
-
             # Setup build flags
-            ARCH_FLAGS_X86="-arch x86_64 -mmacosx-version-min=${X86_DEPLOY} -msse4.2"
-            ARCH_FLAGS_ARM64="-arch arm64 -mmacosx-version-min=${ARM64_DEPLOY}"
-            DEBUG_COMMON_FLAGS="-O0 -g -fPIC -DPIC"
-            RELEASE_COMMON_FLAGS="-O3 -g -fPIC -DPIC -fstack-protector-strong"
-            DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
-            RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
-            DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
-            RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
-            DEBUG_CPPFLAGS="-DPIC"
-            RELEASE_CPPFLAGS="-DPIC"
-            DEBUG_LDFLAGS="-Wl,-headerpad_max_install_names"
-            RELEASE_LDFLAGS="-Wl,-headerpad_max_install_names"
+            C_OPTS_X86="-arch x86_64 $LL_BUILD_RELEASE_CFLAGS"
+            C_OPTS_ARM64="-arch arm64 $LL_BUILD_RELEASE_CFLAGS"
+            CXX_OPTS_X86="-arch x86_64 $LL_BUILD_RELEASE_CXXFLAGS"
+            CXX_OPTS_ARM64="-arch arm64 $LL_BUILD_RELEASE_CXXFLAGS"
+            LINK_OPTS_X86="-arch x86_64 $LL_BUILD_RELEASE_LINKER"
+            LINK_OPTS_ARM64="-arch arm64 $LL_BUILD_RELEASE_LINKER"
+
+            # deploy target
+            export MACOSX_DEPLOYMENT_TARGET=${LL_BUILD_DARWIN_BASE_DEPLOY_TARGET}
 
             # Regen autoconf
             autoreconf -fvi
-
-            # x86 Deploy Target
-            export MACOSX_DEPLOYMENT_TARGET=${X86_DEPLOY}
 
             ARM_PREFIX_RELEASE="$stage/release_arm64"
             X86_PREFIX_RELEASE="$stage/release_x86"
@@ -100,9 +90,9 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             pushd "build_release_x86"
                 cp -a $stage/packages/lib/release/*.a $stage/packages/lib
 
-                CFLAGS="$ARCH_FLAGS_X86 $RELEASE_CFLAGS" \
-                CXXFLAGS="$ARCH_FLAGS_X86 $RELEASE_CXXFLAGS" \
-                LDFLAGS="$ARCH_FLAGS_X86 $RELEASE_LDFLAGS" \
+                CFLAGS="$C_OPTS_X86" \
+                CXXFLAGS="$CXX_OPTS_X86" \
+                LDFLAGS="$LINK_OPTS_X86" \
                     ../configure --prefix="$X86_PREFIX_RELEASE" \
                         --host x86_64-apple-darwin \
                         --with-expat="$stage/packages"
@@ -116,9 +106,9 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             pushd "build_release_arm64"
                 cp -a $stage/packages/lib/release/*.a $stage/packages/lib
 
-                CFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CFLAGS" \
-                CXXFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_CXXFLAGS" \
-                LDFLAGS="$ARCH_FLAGS_ARM64 $RELEASE_LDFLAGS" \
+                CFLAGS="$C_OPTS_ARM64" \
+                CXXFLAGS="$CXX_OPTS_ARM64" \
+                LDFLAGS="$LINK_OPTS_ARM64" \
                     ../configure --prefix="$ARM_PREFIX_RELEASE" \
                         --host arm64-apple-darwin \
                         --with-expat="$stage/packages"
@@ -138,18 +128,25 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             cp -a $X86_PREFIX_RELEASE/include/* $stage/include/xmlrpc-epi/
         ;;
         linux*)
+            # Linux build environment at Linden comes pre-polluted with stuff that can
+            # seriously damage 3rd-party builds.  Environmental garbage you can expect
+            # includes:
+            #
+            #    DISTCC_POTENTIAL_HOSTS     arch           root        CXXFLAGS
+            #    DISTCC_LOCATION            top            branch      CC
+            #    DISTCC_HOSTS               build_name     suffix      CXX
+            #    LSDISTCC_ARGS              repo           prefix      CFLAGS
+            #    cxx_version                AUTOBUILD      SIGN        CPPFLAGS
+            #
+            # So, clear out bits that shouldn't affect our configure-directed build
+            # but which do nonetheless.
+            #
+            unset DISTCC_HOSTS CFLAGS CPPFLAGS CXXFLAGS
+
             # Default target per --address-size
-            opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
-            DEBUG_COMMON_FLAGS="$opts -Og -g -fPIC"
-            RELEASE_COMMON_FLAGS="$opts -O3 -g -fPIC -fstack-protector-strong -DPIC -D_FORTIFY_SOURCE=2"
-            DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
-            RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
-            DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
-            RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
-            DEBUG_CPPFLAGS="-DPIC"
-            RELEASE_CPPFLAGS="-DPIC -D_FORTIFY_SOURCE=2"
-            DEBUG_LDFLAGS="$opts"
-            RELEASE_LDFLAGS="$opts"
+            opts_c="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE_CFLAGS}"
+            opts_cxx="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE_CXXFLAGS}"
+
 
             PREFIX_RELEASE="$stage/temp_release"
 
@@ -159,7 +156,7 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
 
             mkdir -p "build_release"
             pushd "build_release"
-                CFLAGS="$RELEASE_CFLAGS -I$stage/packages/include/expat" CXXFLAGS="$RELEASE_CXXFLAGS" LDFLAGS="-L$stage/packages/lib/release $RELEASE_LDFLAGS" LIBS="-lexpat" \
+                CFLAGS="$opts_c -I$stage/packages/include/expat" CXXFLAGS="$opts_cxx" LDFLAGS="-L$stage/packages/lib/release" LIBS="-lexpat" \
                     ../configure --prefix="$PREFIX_RELEASE" \
                         --with-expat=package \
                         --with-expat-lib="-L$stage/packages/lib/release -lexpat" \

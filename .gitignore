@@ -1,0 +1,14 @@
+stage/
+autobuild-parabuild-bootstrap/
+zlib/*.lo
+zlib/*.o
+zlib/*.so*
+zlib/*.a
+zlib/*.pc
+zlib/example*
+zlib/minigzip*
+zlib/*.dylib
+zlib/ztest*.dSYM/
+zlib/configure.log
+zlib/Makefile
+zlib/zconf.h

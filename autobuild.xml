@@ -117,7 +117,6 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/debug/*.a</string>
             <string>lib/release/*.a</string>
 </array>
           <key>build_directory</key>
@@ -142,7 +141,6 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/debug/*.a</string>
             <string>lib/release/*.a</string>
 </array>
           <key>build_directory</key>
@@ -187,7 +185,7 @@
       <key>name</key>
       <string>xmlrpc-epi</string>
       <key>canonical_repo</key>
-      <string>https://git.alchemyviewer.org/alchemy/thirdparty/3p-xmlrpc-epi</string>
+      <string>https://github.com/AlchemyViewer/3p-xmlrpc-epi</string>
       <key>description</key>
       <string>XMLRPC Library</string>
     </map>

@@ -48,8 +48,8 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
         windows*)
             load_vsvars
 
-            build_sln "xmlrpcepi.sln" "Debug|$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
-            build_sln "xmlrpcepi.sln" "Release|$AUTOBUILD_WIN_VSPLATFORM" "xmlrpcepi"
+            msbuild.exe $(cygpath -w 'xmlrpcepi.sln') /p:Configuration=Debug /p:Platform=$AUTOBUILD_WIN_VSPLATFORM
+            msbuild.exe $(cygpath -w 'xmlrpcepi.sln') /p:Configuration=Release /p:Platform=$AUTOBUILD_WIN_VSPLATFORM
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
 
@@ -66,17 +66,13 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             copy_headers "$stage/include/xmlrpc-epi"
         ;;
         darwin*)
-            # Setup osx sdk platform
-            SDKNAME="macosx"
-            export SDKROOT=$(xcodebuild -version -sdk ${SDKNAME} Path)
-
             # Deploy Targets
-            X86_DEPLOY=10.15
+            X86_DEPLOY=11.0
             ARM64_DEPLOY=11.0
 
             # Setup build flags
-            ARCH_FLAGS_X86="-arch x86_64 -mmacosx-version-min=${X86_DEPLOY} -isysroot ${SDKROOT} -msse4.2"
-            ARCH_FLAGS_ARM64="-arch arm64 -mmacosx-version-min=${ARM64_DEPLOY} -isysroot ${SDKROOT}"
+            ARCH_FLAGS_X86="-arch x86_64 -mmacosx-version-min=${X86_DEPLOY} -msse4.2"
+            ARCH_FLAGS_ARM64="-arch arm64 -mmacosx-version-min=${ARM64_DEPLOY}"
             DEBUG_COMMON_FLAGS="-O0 -g -fPIC -DPIC"
             RELEASE_COMMON_FLAGS="-O3 -g -fPIC -DPIC -fstack-protector-strong"
             DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
@@ -94,31 +90,11 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             # x86 Deploy Target
             export MACOSX_DEPLOYMENT_TARGET=${X86_DEPLOY}
 
-            ARM_PREFIX_DEBUG="$stage/debug_arm64"
             ARM_PREFIX_RELEASE="$stage/release_arm64"
-            X86_PREFIX_DEBUG="$stage/debug_x86"
             X86_PREFIX_RELEASE="$stage/release_x86"
 
-            mkdir -p $ARM_PREFIX_DEBUG
             mkdir -p $ARM_PREFIX_RELEASE
-            mkdir -p $X86_PREFIX_DEBUG
             mkdir -p $X86_PREFIX_RELEASE
-
-            mkdir -p "build_debug_x86"
-            pushd "build_debug_x86"
-                cp -a $stage/packages/lib/debug/*.a $stage/packages/lib
-
-                CFLAGS="$ARCH_FLAGS_X86 $DEBUG_CFLAGS" \
-                CXXFLAGS="$ARCH_FLAGS_X86 $DEBUG_CXXFLAGS" \
-                LDFLAGS="$ARCH_FLAGS_X86 $DEBUG_LDFLAGS" \
-                    ../configure --enable-debug --prefix="$X86_PREFIX_DEBUG" \
-                        --host x86_64-apple-darwin \
-                        --with-expat="$stage/packages"
-                make -j$AUTOBUILD_CPU_COUNT
-                make install
-
-                rm $stage/packages/lib/*.a
-            popd
 
             mkdir -p "build_release_x86"
             pushd "build_release_x86"
@@ -129,25 +105,6 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
                 LDFLAGS="$ARCH_FLAGS_X86 $RELEASE_LDFLAGS" \
                     ../configure --prefix="$X86_PREFIX_RELEASE" \
                         --host x86_64-apple-darwin \
-                        --with-expat="$stage/packages"
-                make -j$AUTOBUILD_CPU_COUNT
-                make install
-
-                rm $stage/packages/lib/*.a
-            popd
-
-            # ARM64 Deploy Target
-            export MACOSX_DEPLOYMENT_TARGET=${ARM64_DEPLOY}
-
-            mkdir -p "build_debug_arm64"
-            pushd "build_debug_arm64"
-                cp -a $stage/packages/lib/debug/*.a $stage/packages/lib
-
-                CFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CFLAGS" \
-                CXXFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_CXXFLAGS" \
-                LDFLAGS="$ARCH_FLAGS_ARM64 $DEBUG_LDFLAGS" \
-                    ../configure --enable-debug --prefix="$ARM_PREFIX_DEBUG" \
-                        --host arm64-apple-darwin \
                         --with-expat="$stage/packages"
                 make -j$AUTOBUILD_CPU_COUNT
                 make install
@@ -172,11 +129,9 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             popd
 
             mkdir -p "$stage/include/xmlrpc-epi"
-            mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
 
             # create fat libs
-            lipo -create ${stage}/debug_x86/lib/libxmlrpc-epi.a ${stage}/debug_arm64/lib/libxmlrpc-epi.a -output ${stage}/lib/debug/libxmlrpc-epi.a
             lipo -create ${stage}/release_x86/lib/libxmlrpc-epi.a ${stage}/release_arm64/lib/libxmlrpc-epi.a -output ${stage}/lib/release/libxmlrpc-epi.a
 
             # copy includes
@@ -196,24 +151,11 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             DEBUG_LDFLAGS="$opts"
             RELEASE_LDFLAGS="$opts"
 
-            PREFIX_DEBUG="$stage/temp_debug"
             PREFIX_RELEASE="$stage/temp_release"
 
-            mkdir -p $PREFIX_DEBUG
             mkdir -p $PREFIX_RELEASE
 
             autoreconf -fvi
-
-            mkdir -p "build_debug"
-            pushd "build_debug"
-                CFLAGS="$DEBUG_CFLAGS -I$stage/packages/include/expat" CXXFLAGS="$DEBUG_CXXFLAGS" LDFLAGS="-L$stage/packages/lib/debug $DEBUG_LDFLAGS" LIBS="-lexpat" \
-                    ../configure --prefix="$PREFIX_DEBUG" \
-                        --with-expat=package \
-                        --with-expat-lib="-L$stage/packages/lib/debug -lexpat" \
-                        --with-expat-inc="$stage/packages/include/expat"
-                make -j$AUTOBUILD_CPU_COUNT
-                make install
-            popd
 
             mkdir -p "build_release"
             pushd "build_release"
@@ -230,7 +172,6 @@ pushd "$XMLRPCEPI_SOURCE_DIR"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
 
-            cp -a $PREFIX_DEBUG/lib/*.a $stage/lib/debug
             cp -a $PREFIX_RELEASE/lib/*.a $stage/lib/release
 
             cp -a $PREFIX_RELEASE/include/* $stage/include/xmlrpc-epi/
